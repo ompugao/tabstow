@@ -144,6 +144,16 @@ func (s *Server) handleCallback(w http.ResponseWriter, r *http.Request) {
 		redirectWithFragment(w, r, redirect, url.Values{"error": {"not_allowed"}, "identity": {id.AllowlistKey()}})
 		return
 	}
+	taken, err := s.Store.IdentityTakenByOtherSubject(r.Context(), id.Provider, id.Subject, id.AllowlistKey())
+	if err != nil {
+		s.internalError(w, err)
+		return
+	}
+	if taken {
+		s.Log.Warn("sign-in rejected: identity belongs to another account", "identity", id.AllowlistKey(), "subject", id.Subject)
+		redirectWithFragment(w, r, redirect, url.Values{"error": {"not_allowed"}, "identity": {id.AllowlistKey()}})
+		return
+	}
 	user, err := s.Store.UpsertUser(r.Context(), id.Provider, id.Subject, id.AllowlistKey(), id.Email)
 	if err != nil {
 		s.internalError(w, err)

@@ -23,7 +23,7 @@ Do not re-open these without asking.
 | Hosting | Self-hosted only. Docker Compose with app + data volume; TLS is the user's reverse proxy |
 | Sign-in | Server-side OAuth. Providers: `github` (default), `google`, generic `oidc`. Personal access tokens were deferred |
 | Accounts | Keyed by provider + provider user id. Accounts from different providers are not linked |
-| Allowlist | `github:<login>`, `google:<email>`, `oidc:<email>`. Empty allowlist means nobody can sign in. Checked again on every API request, so removing an entry ends that user's sessions |
+| Allowlist | `github:<login>`, `google:<email>`, `oidc:<email>`. Empty allowlist means nobody can sign in. Checked again on every API request, so removing an entry ends that user's sessions. A GitHub login stays bound to the first account (numeric id) that used it, so a re-registered login is refused |
 | Extension IDs | `EXTENSION_IDS` is required when a provider is configured. Tokens are only redirected to `https://<listed id>.chromiumapp.org/<short path>`; otherwise any installed extension could sign in silently and read the user's tabs |
 | Session | Random bearer token, SHA-256 stored, 1 year TTL, "sign out everywhere" supported |
 | Device | One device per extension install, random id, user-editable name |

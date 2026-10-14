@@ -245,3 +245,14 @@ func TestRemovingUserFromAllowlistEndsTheirSessions(t *testing.T) {
 		t.Fatalf("got %s", resp.Status)
 	}
 }
+
+func TestReusedGitHubLoginCannotSignIn(t *testing.T) {
+	api, srv := newTestAPI(t, "github:alice", alice)
+	signIn(t, srv, "github")
+	// Someone else registers the login "alice" after the original owner renamed theirs.
+	api.Providers = []auth.Provider{fakeProvider{auth.Identity{Provider: "github", Subject: "2", Login: "alice"}}}
+	frag := signIn(t, srv, "github")
+	if frag.Get("token") != "" || frag.Get("error") != "not_allowed" {
+		t.Fatalf("fragment = %v", frag)
+	}
+}

@@ -31,6 +31,17 @@ func (s *Store) UpsertUser(ctx context.Context, provider, subject, identity, ema
 	return User{ID: id, Provider: provider, Identity: identity, Email: email}, nil
 }
 
+// IdentityTakenByOtherSubject reports whether identity already belongs to a
+// different account of the same provider. GitHub logins can be renamed and
+// re-registered, so an allowlisted login must stay bound to its first owner.
+func (s *Store) IdentityTakenByOtherSubject(ctx context.Context, provider, subject, identity string) (bool, error) {
+	var n int
+	err := s.db.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM users WHERE provider = ? AND identity = ? AND subject != ?`,
+		provider, identity, subject).Scan(&n)
+	return n > 0, err
+}
+
 func randomToken() string {
 	b := make([]byte, 32)
 	rand.Read(b)
