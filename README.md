@@ -60,7 +60,7 @@ Copy `.env.example` to `.env` and fill it in.
 | `ALLOWLIST` | yes | Comma-separated identities that may sign in: `github:<login>`, `google:<email>`, `oidc:<email>`. Empty means nobody can sign in. Removing an entry also ends that user's existing sessions. A GitHub login stays bound to the first GitHub account that signed in with it, so someone who later registers a freed login is refused. |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | one provider | GitHub OAuth app |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | one provider | Google OAuth client |
-| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | one provider | Generic OpenID Connect provider |
+| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | one provider | Generic OpenID Connect provider. It must send `email_verified: true` in the ID token. |
 | `LISTEN_ADDR` | no | Default `:8080` |
 | `DB_PATH` | no | Default `tabstow.db` (`/data/tabstow.db` in Docker) |
 | `TOKEN_TTL` | no | How long a sign-in lasts. Default `8760h` (one year) |
@@ -74,13 +74,14 @@ docker compose up -d --build
 ```
 
 The compose file binds the server to `127.0.0.1:8080`. Put it behind your reverse proxy with HTTPS
-(OAuth providers require HTTPS callback URLs except for localhost). `GET /healthz` returns `ok`.
+(OAuth providers require HTTPS callback URLs except for localhost). `GET /healthz` returns `ok`,
+and opening the server URL in a browser shows a short page explaining what the server is.
 
 Without Docker:
 
 ```sh
 mise run build              # builds server/bin/tabstow-server
-BASE_URL=... ALLOWLIST=... GITHUB_CLIENT_ID=... GITHUB_CLIENT_SECRET=... ./server/bin/tabstow-server
+BASE_URL=... ALLOWLIST=... EXTENSION_IDS=... GITHUB_CLIENT_ID=... GITHUB_CLIENT_SECRET=... ./server/bin/tabstow-server
 ```
 
 ## Installing the extension
@@ -94,12 +95,12 @@ mise run ext:build
 Open `chrome://extensions`, enable Developer mode, click "Load unpacked", and choose the `extension/dist` folder
 (the one that contains `manifest.json`).
 Then open Tabstow's Settings, enter your server URL, allow access when the browser asks, and sign in.
-Before signing in, add the extension ID shown in Settings to `EXTENSION_IDS` on the server.
+Before signing in, add the extension ID shown in Settings to `EXTENSION_IDS` on the server and restart it.
+Give each machine a name you will recognize.
 
 The ID of an unpacked extension is derived from the folder it was loaded from, so keep the folder where it is.
 A copy installed from the Chrome Web Store has a different, fixed ID; list both in `EXTENSION_IDS` if you use both.
 To give an unpacked copy the store ID, add the item's public key from the developer dashboard to `manifest.json` as `"key"`.
-Give each machine a name you will recognize.
 
 ## Privacy
 
