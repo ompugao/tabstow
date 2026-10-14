@@ -1,4 +1,4 @@
-# Tabstow
+# ![image](./extension/public/icons/icon32.png) Tabstow
 
 Tabstow is a tab manager for Chromium-based browsers (Chrome, Edge, Brave), similar to OneTab.
 Click the toolbar button and the tabs of the current window are stowed into a list and closed.
@@ -9,6 +9,8 @@ so you can see, open, edit, and delete tabs stowed on any of your machines.
 - Works fully offline. Sync is optional.
 - Self-hosted server: one Go binary with one SQLite file.
 - Sign-in with GitHub (default), Google, or any OpenID Connect provider, restricted by an allowlist.
+
+
 
 ## Using the extension
 
