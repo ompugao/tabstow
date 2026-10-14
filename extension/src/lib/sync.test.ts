@@ -63,6 +63,14 @@ async function groupTitle(store: Store, id: string) {
 }
 
 describe('syncOnce', () => {
+  it('ignores malformed records from the server', async () => {
+    const server = new FakeServer();
+    const a = device(server, 1000);
+    server.records.set('bad', { id: 'bad', kind: 'tab', updatedAt: 1, deleted: false, seq: ++server.seq } as never);
+    await a.sync();
+    expect((await a.store.all()).has('bad')).toBe(false);
+  });
+
   it('copies a group archived on one device to another', async () => {
     const server = new FakeServer();
     const a = device(server, 1000);

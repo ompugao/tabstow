@@ -68,6 +68,8 @@ Groups have no position; they sort by starred, then `createdAt` descending.
   local records dirty so they upload to the new server.
 - Favicons come from Chrome's `_favicon` endpoint, never from the stowed sites.
 - Only http(s)/ftp/file URLs are rendered as links or opened (`isOpenableUrl`), whatever the record says.
+- Records from the server or an import file pass `isValidRecord` (`src/lib/model.ts`) before they are stored,
+  so a malformed record cannot break rendering or be pushed back and block every later sync.
 
 ### Server (`server/`)
 

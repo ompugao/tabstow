@@ -98,3 +98,22 @@ describe('Store', () => {
     expect((await store.all()).get(g1)!.deleted).toBe(true);
   });
 });
+
+describe('importRecords', () => {
+  it('drops malformed records', async () => {
+    const { store } = await setup();
+    const good = { id: 'g1', kind: 'group', updatedAt: 5, deleted: false, data: { deviceId: 'd', title: 'x' } };
+    await store.importRecords([
+      good,
+      { id: 't1', kind: 'tab', updatedAt: 5, deleted: false },
+      { id: 'x'.repeat(65), kind: 'device', updatedAt: 5, deleted: false, data: { name: 'n' } },
+      { id: 'b', kind: 'bogus', updatedAt: 5, deleted: false, data: {} },
+      null,
+    ] as unknown as Parameters<Store['importRecords']>[0]);
+    const all = await store.all();
+    expect(all.has('g1')).toBe(true);
+    expect(all.has('t1')).toBe(false);
+    expect(all.has('b')).toBe(false);
+    expect([...all.keys()].some((k) => k.length > 64)).toBe(false);
+  });
+});

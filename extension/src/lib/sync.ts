@@ -1,4 +1,4 @@
-import { recordKey, stripLocal, type Rec, type StoredRec } from './model';
+import { isValidRecord, recordKey, stripLocal, type Rec, type StoredRec } from './model';
 import { tombstone, type Store } from './store';
 
 export interface SyncResponse {
@@ -31,6 +31,7 @@ export async function syncOnce(store: Store, transport: SyncTransport): Promise<
   const items: Record<string, StoredRec> = {};
   const returned = new Set<string>();
   for (const incoming of res.changes) {
+    if (!isValidRecord(incoming)) continue;
     returned.add(incoming.id);
     const local = current.get(incoming.id);
     if (local?.dirty && local.updatedAt > incoming.updatedAt) continue;

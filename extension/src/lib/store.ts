@@ -2,6 +2,7 @@ import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing';
 import type { KV } from './storage';
 import {
   isRecordKey,
+  isValidRecord,
   newId,
   recordKey,
   type DeviceRec,
@@ -165,7 +166,7 @@ export class Store {
   }
 
   async importRecords(recs: Rec[]): Promise<void> {
-    await this.write(recs.filter((r) => r && typeof r.id === 'string' && ['device', 'group', 'tab'].includes(r.kind)));
+    await this.write(recs.filter(isValidRecord));
   }
 }
 
