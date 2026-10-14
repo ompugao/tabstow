@@ -130,13 +130,16 @@ function AccountSection(props: { serverUrl: string; identity: string | null }) {
           </div>
         </>
       ) : (
-        <div class="row">
-          {(providers ?? []).map((p) => (
-            <button class="primary" key={p} onClick={() => doSignIn(p)}>
-              {t('signInWith', PROVIDER_LABELS[p] ?? p)}
-            </button>
-          ))}
-        </div>
+        <>
+          <p class="muted">{t('extensionIdHelp', chrome.runtime.id)}</p>
+          <div class="row">
+            {(providers ?? []).map((p) => (
+              <button class="primary" key={p} onClick={() => doSignIn(p)}>
+                {t('signInWith', PROVIDER_LABELS[p] ?? p)}
+              </button>
+            ))}
+          </div>
+        </>
       )}
       <Msg msg={msg} />
     </section>

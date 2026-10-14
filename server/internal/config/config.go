@@ -17,6 +17,7 @@ type Config struct {
 	TokenTTL     time.Duration
 	TombstoneTTL time.Duration
 	DevToken     string
+	ExtensionIDs string
 
 	GitHubClientID, GitHubClientSecret   string
 	GoogleClientID, GoogleClientSecret   string
@@ -36,6 +37,7 @@ func Load(getenv func(string) string) (Config, error) {
 		BaseURL:            strings.TrimRight(getenv("BASE_URL"), "/"),
 		Allowlist:          getenv("ALLOWLIST"),
 		DevToken:           getenv("DEV_TOKEN"),
+		ExtensionIDs:       getenv("EXTENSION_IDS"),
 		GitHubClientID:     getenv("GITHUB_CLIENT_ID"),
 		GitHubClientSecret: getenv("GITHUB_CLIENT_SECRET"),
 		GoogleClientID:     getenv("GOOGLE_CLIENT_ID"),

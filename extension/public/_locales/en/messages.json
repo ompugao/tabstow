@@ -161,6 +161,14 @@
   "server": {
     "message": "Sync server"
   },
+  "extensionIdHelp": {
+    "message": "This extension's ID is $ID$. The server must list it in EXTENSION_IDS before you can sign in.",
+    "placeholders": {
+      "id": {
+        "content": "$1"
+      }
+    }
+  },
   "serverHelp": {
     "message": "The URL of your Tabstow server. Leave empty to use Tabstow on this machine only."
   },

@@ -24,9 +24,12 @@ type Server struct {
 	Store     *store.Store
 	Providers []auth.Provider
 	Allow     auth.Allowlist
-	TokenTTL  time.Duration
-	DevToken  string
-	Log       *slog.Logger
+	// ExtensionIDs are the extensions allowed to receive sign-in tokens. Without
+	// this, any installed extension could run the sign-in flow for itself.
+	ExtensionIDs map[string]bool
+	TokenTTL     time.Duration
+	DevToken     string
+	Log          *slog.Logger
 }
 
 func (s *Server) Handler() http.Handler {
@@ -77,8 +80,14 @@ func (s *Server) handleStart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	redirect := r.URL.Query().Get("redirect")
-	if !auth.ValidRedirect(redirect) {
+	extID, ok := auth.ExtensionIDFromRedirect(redirect)
+	if !ok {
 		http.Error(w, "invalid redirect", http.StatusBadRequest)
+		return
+	}
+	if !s.ExtensionIDs[extID] {
+		s.Log.Warn("sign-in from an extension not in EXTENSION_IDS", "extension_id", extID)
+		http.Error(w, "this extension is not allowed to sign in; add its ID to EXTENSION_IDS on the server", http.StatusForbidden)
 		return
 	}
 	state, err := s.Store.CreateState(r.Context(), p.Name(), redirect, stateTTL)

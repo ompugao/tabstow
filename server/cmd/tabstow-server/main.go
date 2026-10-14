@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -58,6 +59,13 @@ func run(log *slog.Logger) error {
 	if len(allow) == 0 {
 		log.Warn("ALLOWLIST is empty; nobody can sign in")
 	}
+	extIDs, err := auth.ParseExtensionIDs(cfg.ExtensionIDs)
+	if err != nil {
+		return fmt.Errorf("EXTENSION_IDS: %w", err)
+	}
+	if len(ps) > 0 && len(extIDs) == 0 {
+		return errors.New("EXTENSION_IDS is required: the ID of your Tabstow extension, shown in its Settings page and on chrome://extensions")
+	}
 	if cfg.DevToken != "" {
 		log.Warn("DEV_TOKEN is set; any request with this bearer token is accepted")
 	}
@@ -66,7 +74,7 @@ func run(log *slog.Logger) error {
 	defer stop()
 	go purgeLoop(ctx, st, cfg.TombstoneTTL, log)
 
-	api := &httpapi.Server{Store: st, Providers: ps, Allow: allow, TokenTTL: cfg.TokenTTL, DevToken: cfg.DevToken, Log: log}
+	api := &httpapi.Server{Store: st, Providers: ps, Allow: allow, ExtensionIDs: extIDs, TokenTTL: cfg.TokenTTL, DevToken: cfg.DevToken, Log: log}
 	srv := &http.Server{Addr: cfg.ListenAddr, Handler: api.Handler(), ReadHeaderTimeout: 10 * time.Second}
 	go func() {
 		<-ctx.Done()

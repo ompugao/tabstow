@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"golang.org/x/oauth2"
@@ -37,19 +38,35 @@ func TestEmptyAllowlistAllowsNobody(t *testing.T) {
 	}
 }
 
-func TestValidRedirectAcceptsOnlyChromiumAppURLs(t *testing.T) {
+func TestExtensionIDFromRedirectAcceptsOnlyChromiumAppURLs(t *testing.T) {
 	cases := map[string]bool{
-		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/":      true,
-		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/cb":    true,
-		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org.evil/": false,
-		"https://evil.example.com/":                                      false,
-		"http://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/":       false,
-		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/#x":    false,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/":                           true,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/cb":                         true,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org.evil/":                      false,
+		"https://evil.example.com/":                                                           false,
+		"http://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/":                            false,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/#x":                         false,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/a\r\nb":                     false,
+		"https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/" + strings.Repeat("a", 65): false,
 	}
 	for url, want := range cases {
-		if got := ValidRedirect(url); got != want {
-			t.Errorf("ValidRedirect(%q) = %v, want %v", url, got, want)
+		id, ok := ExtensionIDFromRedirect(url)
+		if ok != want {
+			t.Errorf("ExtensionIDFromRedirect(%q) = %v, want %v", url, ok, want)
 		}
+		if ok && id != "abcdefghijklmnopabcdefghijklmnop" {
+			t.Errorf("ExtensionIDFromRedirect(%q) id = %q", url, id)
+		}
+	}
+}
+
+func TestParseExtensionIDs(t *testing.T) {
+	ids, err := ParseExtensionIDs(" abcdefghijklmnopabcdefghijklmnop , ")
+	if err != nil || !ids["abcdefghijklmnopabcdefghijklmnop"] || len(ids) != 1 {
+		t.Fatalf("got %v, %v", ids, err)
+	}
+	if _, err := ParseExtensionIDs("not-an-id"); err == nil {
+		t.Fatal("expected error for invalid ID")
 	}
 }
 

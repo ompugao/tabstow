@@ -55,6 +55,7 @@ Copy `.env.example` to `.env` and fill it in.
 | Variable | Required | Description |
 |---|---|---|
 | `BASE_URL` | yes | Public URL of the server, without a trailing slash |
+| `EXTENSION_IDS` | yes | Comma-separated IDs of the Tabstow extensions allowed to sign in. Shown in the extension's Settings page and on `chrome://extensions`. Without this, any other installed extension could sign in to your server and read your tabs. |
 | `ALLOWLIST` | yes | Comma-separated identities that may sign in: `github:<login>`, `google:<email>`, `oidc:<email>`. Empty means nobody can sign in. |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | one provider | GitHub OAuth app |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | one provider | Google OAuth client |
@@ -92,6 +93,11 @@ mise run ext:build
 Open `chrome://extensions`, enable Developer mode, click "Load unpacked", and choose the `extension/dist` folder
 (the one that contains `manifest.json`).
 Then open Tabstow's Settings, enter your server URL, allow access when the browser asks, and sign in.
+Before signing in, add the extension ID shown in Settings to `EXTENSION_IDS` on the server.
+
+The ID of an unpacked extension is derived from the folder it was loaded from, so keep the folder where it is.
+A copy installed from the Chrome Web Store has a different, fixed ID; list both in `EXTENSION_IDS` if you use both.
+To give an unpacked copy the store ID, add the item's public key from the developer dashboard to `manifest.json` as `"key"`.
 Give each machine a name you will recognize.
 
 ## Privacy

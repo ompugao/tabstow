@@ -24,6 +24,7 @@ Do not re-open these without asking.
 | Sign-in | Server-side OAuth. Providers: `github` (default), `google`, generic `oidc`. Personal access tokens were deferred |
 | Accounts | Keyed by provider + provider user id. Accounts from different providers are not linked |
 | Allowlist | `github:<login>`, `google:<email>`, `oidc:<email>`. Empty allowlist means nobody can sign in |
+| Extension IDs | `EXTENSION_IDS` is required when a provider is configured. Tokens are only redirected to `https://<listed id>.chromiumapp.org/<short path>`; otherwise any installed extension could sign in silently and read the user's tabs |
 | Session | Random bearer token, SHA-256 stored, 1 year TTL, "sign out everywhere" supported |
 | Device | One device per extension install, random id, user-editable name |
 | Cross-machine | Full edit from any machine |

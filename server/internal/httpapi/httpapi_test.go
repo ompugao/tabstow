@@ -29,21 +29,28 @@ func (f fakeProvider) Exchange(context.Context, string) (auth.Identity, error) {
 
 func newTestServer(t *testing.T, allow string, id auth.Identity) *httptest.Server {
 	t.Helper()
+	_, srv := newTestAPI(t, allow, id)
+	return srv
+}
+
+func newTestAPI(t *testing.T, allow string, id auth.Identity) (*Server, *httptest.Server) {
+	t.Helper()
 	st, err := store.Open(":memory:")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { st.Close() })
 	s := &Server{
-		Store:     st,
-		Providers: []auth.Provider{fakeProvider{id}},
-		Allow:     auth.ParseAllowlist(allow),
-		TokenTTL:  time.Hour,
-		Log:       slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Store:        st,
+		Providers:    []auth.Provider{fakeProvider{id}},
+		Allow:        auth.ParseAllowlist(allow),
+		ExtensionIDs: map[string]bool{"abcdefghijklmnopabcdefghijklmnop": true},
+		TokenTTL:     time.Hour,
+		Log:          slog.New(slog.NewTextHandler(io.Discard, nil)),
 	}
 	srv := httptest.NewServer(s.Handler())
 	t.Cleanup(srv.Close)
-	return srv
+	return s, srv
 }
 
 var noFollow = &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
@@ -209,5 +216,23 @@ func TestLandingPage(t *testing.T) {
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusNotFound {
 		t.Fatalf("GET /nope: %s", resp.Status)
+	}
+}
+
+func TestStartRejectsExtensionNotInExtensionIDs(t *testing.T) {
+	srv := newTestServer(t, "github:alice", alice)
+	other := "https://ponmlkjihgfedcbaponmlkjihgfedcba.chromiumapp.org/"
+	resp, _ := noFollow.Get(srv.URL + "/auth/github/start?redirect=" + url.QueryEscape(other))
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("got %s", resp.Status)
+	}
+}
+
+func TestStartRejectsOverlongRedirect(t *testing.T) {
+	srv := newTestServer(t, "github:alice", alice)
+	long := extRedirect + strings.Repeat("a", 1000)
+	resp, _ := noFollow.Get(srv.URL + "/auth/github/start?redirect=" + url.QueryEscape(long))
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Fatalf("got %s", resp.Status)
 	}
 }
