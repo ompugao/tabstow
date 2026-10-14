@@ -98,9 +98,12 @@ Verified:
   `pipe: true, enableExtensions: true`, call `browser.installExtension()`, write `settings` and `auth`
   into `chrome.storage.local` from the list page, and use `page.triggerExtensionAction()`.
 - The Docker image builds and runs (~25 MB, distroless, non-root, `/data` owned by `nonroot`).
+- The owner loaded `extension/dist` unpacked in their own Chrome and confirmed it works locally
+  (without a sync server).
 
 Not verified:
 
+- Sync against the owner's deployed server.
 - Real sign-in with GitHub, Google, or a generic OIDC provider. It needs an OAuth app created by the owner.
 - Edge and Brave (only Chrome was tested).
 - Drag and drop in the list page was not exercised by automated tests.
@@ -129,6 +132,9 @@ Not verified:
   compose file was rejected because Compose v5 then demands `--allow=network.host` on every build.
 - Chrome's sandbox cannot start inside the agent's sandboxed shell; automated browser runs needed
   `--no-sandbox`.
-- `go build` fails with a VCS stamping error until the repo has a commit; the mise build task passes
-  `-buildvcs=false`.
+- `mise run build` writes the server binary to `server/bin/` (gitignored). It used to write to a
+  top-level `dist/`, and the owner loaded that folder in Chrome by mistake; `extension/dist` should be the
+  only `dist` folder.
+- The mise build task passes `-buildvcs=false` because `go build` failed with a VCS stamping error
+  before the first commit.
 - The owner's `.env` was empty at the time of writing; the server exits when `BASE_URL` is missing.

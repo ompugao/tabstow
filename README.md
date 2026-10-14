@@ -77,8 +77,8 @@ The compose file binds the server to `127.0.0.1:8080`. Put it behind your revers
 Without Docker:
 
 ```sh
-mise run build              # builds dist/tabstow-server
-BASE_URL=... ALLOWLIST=... GITHUB_CLIENT_ID=... GITHUB_CLIENT_SECRET=... ./dist/tabstow-server
+mise run build              # builds server/bin/tabstow-server
+BASE_URL=... ALLOWLIST=... GITHUB_CLIENT_ID=... GITHUB_CLIENT_SECRET=... ./server/bin/tabstow-server
 ```
 
 ## Installing the extension
@@ -89,7 +89,8 @@ mise run ext:install
 mise run ext:build
 ```
 
-Open `chrome://extensions`, enable Developer mode, click "Load unpacked", and choose `extension/dist`.
+Open `chrome://extensions`, enable Developer mode, click "Load unpacked", and choose the `extension/dist` folder
+(the one that contains `manifest.json`).
 Then open Tabstow's Settings, enter your server URL, allow access when the browser asks, and sign in.
 Give each machine a name you will recognize.
 

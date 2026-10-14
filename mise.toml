@@ -34,7 +34,7 @@ run = "go test ./..."
 [tasks.build]
 depends = ["ext:build"]
 dir = "server"
-run = "CGO_ENABLED=0 go build -buildvcs=false -o ../dist/tabstow-server ./cmd/tabstow-server"
+run = "CGO_ENABLED=0 go build -buildvcs=false -o bin/tabstow-server ./cmd/tabstow-server"
 
 [tasks.test]
 depends = ["ext:test", "server:test"]
