@@ -236,3 +236,12 @@ func TestStartRejectsOverlongRedirect(t *testing.T) {
 		t.Fatalf("got %s", resp.Status)
 	}
 }
+
+func TestRemovingUserFromAllowlistEndsTheirSessions(t *testing.T) {
+	api, srv := newTestAPI(t, "github:alice", alice)
+	token := signIn(t, srv, "github").Get("token")
+	api.Allow = auth.ParseAllowlist("")
+	if resp := call(t, srv, "GET", "/api/me", token, nil); resp.StatusCode != 401 {
+		t.Fatalf("got %s", resp.Status)
+	}
+}

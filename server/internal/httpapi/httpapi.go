@@ -190,7 +190,12 @@ func (s *Server) lookup(ctx context.Context, token string) (store.User, error) {
 	if s.DevToken != "" && token == s.DevToken {
 		return s.Store.UpsertUser(ctx, "dev", "local", "dev:local", "")
 	}
-	return s.Store.UserByToken(ctx, token)
+	user, err := s.Store.UserByToken(ctx, token)
+	// Removing someone from ALLOWLIST must also end their existing sessions.
+	if err == nil && !s.Allow[user.Identity] {
+		return store.User{}, store.ErrNotFound
+	}
+	return user, err
 }
 
 func sessionFrom(r *http.Request) session { return r.Context().Value(ctxKey{}).(session) }

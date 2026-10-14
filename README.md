@@ -56,7 +56,7 @@ Copy `.env.example` to `.env` and fill it in.
 |---|---|---|
 | `BASE_URL` | yes | Public URL of the server, without a trailing slash |
 | `EXTENSION_IDS` | yes | Comma-separated IDs of the Tabstow extensions allowed to sign in. Shown in the extension's Settings page and on `chrome://extensions`. Without this, any other installed extension could sign in to your server and read your tabs. |
-| `ALLOWLIST` | yes | Comma-separated identities that may sign in: `github:<login>`, `google:<email>`, `oidc:<email>`. Empty means nobody can sign in. |
+| `ALLOWLIST` | yes | Comma-separated identities that may sign in: `github:<login>`, `google:<email>`, `oidc:<email>`. Empty means nobody can sign in. Removing an entry also ends that user's existing sessions. |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | one provider | GitHub OAuth app |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | one provider | Google OAuth client |
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | one provider | Generic OpenID Connect provider |
