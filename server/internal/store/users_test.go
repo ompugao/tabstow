@@ -55,3 +55,21 @@ func TestUpsertUserKeepsIDForSameSubject(t *testing.T) {
 		t.Fatalf("got %+v %v", again, err)
 	}
 }
+
+func TestPendingStatesAreCapped(t *testing.T) {
+	s, clock, _ := newTestStore(t)
+	ctx := context.Background()
+	for i := 0; i < MaxPendingStates; i++ {
+		if _, err := s.CreateState(ctx, "github", "https://x/", time.Minute); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := s.CreateState(ctx, "github", "https://x/", time.Minute); !errors.Is(err, ErrTooManyStates) {
+		t.Fatalf("got %v", err)
+	}
+	// Expired states no longer count.
+	clock.t = clock.t.Add(2 * time.Minute)
+	if _, err := s.CreateState(ctx, "github", "https://x/", time.Minute); err != nil {
+		t.Fatal(err)
+	}
+}

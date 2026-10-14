@@ -73,7 +73,24 @@ func (s *Store) DeleteUserTokens(ctx context.Context, userID int64) error {
 	return err
 }
 
+// MaxPendingStates bounds the sign-in attempts in flight, so unauthenticated
+// requests to /auth/{provider}/start cannot grow the database without limit.
+const MaxPendingStates = 1000
+
+var ErrTooManyStates = errors.New("too many pending sign-in attempts")
+
 func (s *Store) CreateState(ctx context.Context, provider, redirect string, ttl time.Duration) (string, error) {
+	now := s.now().UnixMilli()
+	if _, err := s.db.ExecContext(ctx, `DELETE FROM oauth_states WHERE expires_at <= ?`, now); err != nil {
+		return "", err
+	}
+	var pending int
+	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM oauth_states`).Scan(&pending); err != nil {
+		return "", err
+	}
+	if pending >= MaxPendingStates {
+		return "", ErrTooManyStates
+	}
 	state := randomToken()
 	_, err := s.db.ExecContext(ctx,
 		`INSERT INTO oauth_states (state, provider, redirect, expires_at) VALUES (?, ?, ?, ?)`,

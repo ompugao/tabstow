@@ -91,6 +91,10 @@ func (s *Server) handleStart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	state, err := s.Store.CreateState(r.Context(), p.Name(), redirect, stateTTL)
+	if errors.Is(err, store.ErrTooManyStates) {
+		http.Error(w, "too many sign-in attempts, try again later", http.StatusTooManyRequests)
+		return
+	}
 	if err != nil {
 		s.internalError(w, err)
 		return
