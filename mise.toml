@@ -1,0 +1,40 @@
+[tools]
+node = "26"
+pnpm = "12"
+go = "1.27"
+
+[tasks."ext:install"]
+dir = "extension"
+run = "pnpm install"
+
+[tasks."ext:dev"]
+dir = "extension"
+run = "pnpm vite build --watch --mode development"
+
+[tasks."ext:build"]
+dir = "extension"
+run = "pnpm build"
+
+[tasks."ext:test"]
+dir = "extension"
+run = "pnpm test"
+
+[tasks."ext:icons"]
+dir = "extension"
+run = "pnpm icons"
+
+[tasks."server:run"]
+dir = "server"
+run = "go run ./cmd/tabstow-server"
+
+[tasks."server:test"]
+dir = "server"
+run = "go test ./..."
+
+[tasks.build]
+depends = ["ext:build"]
+dir = "server"
+run = "CGO_ENABLED=0 go build -buildvcs=false -o ../dist/tabstow-server ./cmd/tabstow-server"
+
+[tasks.test]
+depends = ["ext:test", "server:test"]

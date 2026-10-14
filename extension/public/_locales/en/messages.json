@@ -1,0 +1,237 @@
+{
+  "extName": {
+    "message": "Tabstow"
+  },
+  "extDescription": {
+    "message": "Stow your open tabs into a list and sync them across machines through your own server."
+  },
+  "actionTitle": {
+    "message": "Stow all tabs in this window"
+  },
+  "cmdArchiveWindow": {
+    "message": "Stow all tabs in the current window"
+  },
+  "menuOpenList": {
+    "message": "Show Tabstow list"
+  },
+  "menuSendWindow": {
+    "message": "Stow all tabs in this window"
+  },
+  "menuSendTab": {
+    "message": "Stow only this tab"
+  },
+  "menuSendRight": {
+    "message": "Stow tabs to the right"
+  },
+  "menuSendAllWindows": {
+    "message": "Stow tabs from all windows"
+  },
+  "menuCopyWindow": {
+    "message": "Copy this window's tabs without closing them"
+  },
+  "account": {
+    "message": "Account"
+  },
+  "accountNeedsServer": {
+    "message": "Set a server URL first."
+  },
+  "behavior": {
+    "message": "Behavior"
+  },
+  "clickToEdit": {
+    "message": "Click to edit"
+  },
+  "collapse": {
+    "message": "Collapse"
+  },
+  "expand": {
+    "message": "Expand"
+  },
+  "data": {
+    "message": "Data"
+  },
+  "deleteAll": {
+    "message": "Delete all"
+  },
+  "deviceHelp": {
+    "message": "Other machines see your stowed tabs under this name."
+  },
+  "emptyDevice": {
+    "message": "No stowed tabs."
+  },
+  "emptyThisDevice": {
+    "message": "No stowed tabs yet. Click the toolbar button to stow the tabs of the current window."
+  },
+  "errImportFormat": {
+    "message": "This file is not a Tabstow export."
+  },
+  "errNotAllowed": {
+    "message": "The server does not allow $IDENTITY$. Ask the server owner to add it to ALLOWLIST.",
+    "placeholders": {
+      "identity": {
+        "content": "$1"
+      }
+    }
+  },
+  "errPermission": {
+    "message": "Permission to access the server was not granted."
+  },
+  "errProviders": {
+    "message": "Could not reach the server: $MSG$",
+    "placeholders": {
+      "msg": {
+        "content": "$1"
+      }
+    }
+  },
+  "errServerUrl": {
+    "message": "Enter an https:// URL (http:// is allowed only for localhost)."
+  },
+  "errSignIn": {
+    "message": "Sign-in failed: $MSG$",
+    "placeholders": {
+      "msg": {
+        "content": "$1"
+      }
+    }
+  },
+  "export": {
+    "message": "Export JSON"
+  },
+  "import": {
+    "message": "Import JSON"
+  },
+  "imported": {
+    "message": "Imported $COUNT$ records.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "groupCount": {
+    "message": "$COUNT$ groups",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "tabCount": {
+    "message": "$COUNT$ tabs",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "lock": {
+    "message": "Lock: keep tabs in the list when opened, prevent deleting"
+  },
+  "unlock": {
+    "message": "Unlock"
+  },
+  "star": {
+    "message": "Star: keep at the top"
+  },
+  "unstar": {
+    "message": "Unstar"
+  },
+  "noMatches": {
+    "message": "Nothing to show."
+  },
+  "removeOnOpen": {
+    "message": "Remove a tab from the list when it is opened (unless its group is locked)"
+  },
+  "removeTab": {
+    "message": "Remove"
+  },
+  "restoreAll": {
+    "message": "Restore all"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "saved": {
+    "message": "Saved."
+  },
+  "searchPlaceholder": {
+    "message": "Search titles and URLs"
+  },
+  "server": {
+    "message": "Sync server"
+  },
+  "serverHelp": {
+    "message": "The URL of your Tabstow server. Leave empty to use Tabstow on this machine only."
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "signedInAs": {
+    "message": "Signed in as $IDENTITY$",
+    "placeholders": {
+      "identity": {
+        "content": "$1"
+      }
+    }
+  },
+  "signInWith": {
+    "message": "Sign in with $PROVIDER$",
+    "placeholders": {
+      "provider": {
+        "content": "$1"
+      }
+    }
+  },
+  "signOut": {
+    "message": "Sign out"
+  },
+  "signOutEverywhere": {
+    "message": "Sign out on all machines"
+  },
+  "statusOk": {
+    "message": "Synced at $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusSyncing": {
+    "message": "Syncing…"
+  },
+  "statusUnconfigured": {
+    "message": "Not syncing (no server set)"
+  },
+  "statusSignedOut": {
+    "message": "Signed out. Open Settings to sign in."
+  },
+  "statusNoPermission": {
+    "message": "Server permission missing. Save the server URL again in Settings."
+  },
+  "statusOffline": {
+    "message": "Server unreachable ($TIME$)",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusError": {
+    "message": "Sync error: $MSG$",
+    "placeholders": {
+      "msg": {
+        "content": "$1"
+      }
+    }
+  },
+  "syncNow": {
+    "message": "Sync now"
+  },
+  "thisDevice": {
+    "message": "This device"
+  },
+  "unknownDevice": {
+    "message": "Unnamed device"
+  }
+}

@@ -1,0 +1,93 @@
+package store
+
+import (
+	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/base64"
+	"encoding/hex"
+	"errors"
+	"time"
+)
+
+type User struct {
+	ID       int64  `json:"-"`
+	Provider string `json:"provider"`
+	Identity string `json:"identity"`
+	Email    string `json:"email"`
+}
+
+func (s *Store) UpsertUser(ctx context.Context, provider, subject, identity, email string) (User, error) {
+	var id int64
+	err := s.db.QueryRowContext(ctx, `
+		INSERT INTO users (provider, subject, identity, email, created_at) VALUES (?, ?, ?, ?, ?)
+		ON CONFLICT(provider, subject) DO UPDATE SET identity = excluded.identity, email = excluded.email
+		RETURNING id`,
+		provider, subject, identity, email, s.now().UnixMilli()).Scan(&id)
+	if err != nil {
+		return User{}, err
+	}
+	return User{ID: id, Provider: provider, Identity: identity, Email: email}, nil
+}
+
+func randomToken() string {
+	b := make([]byte, 32)
+	rand.Read(b)
+	return base64.RawURLEncoding.EncodeToString(b)
+}
+
+func hashToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
+}
+
+func (s *Store) CreateToken(ctx context.Context, userID int64, ttl time.Duration) (string, error) {
+	token := randomToken()
+	now := s.now()
+	_, err := s.db.ExecContext(ctx,
+		`INSERT INTO tokens (hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)`,
+		hashToken(token), userID, now.UnixMilli(), now.Add(ttl).UnixMilli())
+	return token, err
+}
+
+func (s *Store) UserByToken(ctx context.Context, token string) (User, error) {
+	var u User
+	err := s.db.QueryRowContext(ctx, `
+		SELECT u.id, u.provider, u.identity, u.email FROM tokens t JOIN users u ON u.id = t.user_id
+		WHERE t.hash = ? AND t.expires_at > ?`,
+		hashToken(token), s.now().UnixMilli()).Scan(&u.ID, &u.Provider, &u.Identity, &u.Email)
+	if errors.Is(err, sql.ErrNoRows) {
+		return User{}, ErrNotFound
+	}
+	return u, err
+}
+
+func (s *Store) DeleteToken(ctx context.Context, token string) error {
+	_, err := s.db.ExecContext(ctx, `DELETE FROM tokens WHERE hash = ?`, hashToken(token))
+	return err
+}
+
+func (s *Store) DeleteUserTokens(ctx context.Context, userID int64) error {
+	_, err := s.db.ExecContext(ctx, `DELETE FROM tokens WHERE user_id = ?`, userID)
+	return err
+}
+
+func (s *Store) CreateState(ctx context.Context, provider, redirect string, ttl time.Duration) (string, error) {
+	state := randomToken()
+	_, err := s.db.ExecContext(ctx,
+		`INSERT INTO oauth_states (state, provider, redirect, expires_at) VALUES (?, ?, ?, ?)`,
+		state, provider, redirect, s.now().Add(ttl).UnixMilli())
+	return state, err
+}
+
+// TakeState consumes a state so a callback URL cannot be replayed.
+func (s *Store) TakeState(ctx context.Context, state string) (provider, redirect string, err error) {
+	err = s.db.QueryRowContext(ctx,
+		`DELETE FROM oauth_states WHERE state = ? AND expires_at > ? RETURNING provider, redirect`,
+		state, s.now().UnixMilli()).Scan(&provider, &redirect)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", "", ErrNotFound
+	}
+	return provider, redirect, err
+}
