@@ -121,6 +121,9 @@ mise run ext:icons     # regenerate PNG icons from extension/scripts/icon.svg
 mise run ext:zip       # build and pack extension/tabstow-<version>.zip for the Chrome Web Store
 ```
 
+Store listing text, permission justifications, and graphics for publishing are in
+[docs/chrome-web-store.md](docs/chrome-web-store.md) and `extension/store-assets/`.
+
 For a local end-to-end setup, run the server with `BASE_URL=http://localhost:8080 DEV_TOKEN=dev`.
 Sign-in through a real provider also works on localhost if the OAuth app's callback URL is
 `http://localhost:8080/auth/<provider>/callback`.
