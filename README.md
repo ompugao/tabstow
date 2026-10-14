@@ -118,6 +118,7 @@ mise run test          # extension and server tests
 mise run ext:dev       # rebuild the extension on change
 mise run server:run    # needs the environment variables above
 mise run ext:icons     # regenerate PNG icons from extension/scripts/icon.svg
+mise run ext:zip       # build and pack extension/tabstow-<version>.zip for the Chrome Web Store
 ```
 
 For a local end-to-end setup, run the server with `BASE_URL=http://localhost:8080 DEV_TOKEN=dev`.

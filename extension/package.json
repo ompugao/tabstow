@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "zip": "node scripts/zip.mjs"
   },
   "dependencies": {
     "fractional-indexing": "^4.0.0",

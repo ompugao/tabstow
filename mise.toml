@@ -19,6 +19,12 @@ run = "pnpm build"
 dir = "extension"
 run = "pnpm test"
 
+[tasks."ext:zip"]
+description = "Build the extension and pack it for the Chrome Web Store"
+depends = ["ext:build"]
+dir = "extension"
+run = "pnpm zip"
+
 [tasks."ext:icons"]
 dir = "extension"
 run = "pnpm icons"
