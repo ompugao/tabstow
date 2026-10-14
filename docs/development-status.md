@@ -129,7 +129,7 @@ Not verified:
 - Personal access token sign-in (paste a token generated on the server).
 - A web UI on the server (only a static landing page exists), duplicate detection, Chrome tab group colors, Firefox, Japanese locale,
   client-side encryption, group reordering.
-- Chrome Web Store assets: the icon in `extension/scripts/icon.svg` is a placeholder; no screenshots yet.
+- Chrome Web Store: listing text in `docs/chrome-web-store.md`, graphics in `extension/store-assets/`. Not submitted yet.
 - `extension/scripts/make-icons.mjs` regenerates PNGs; the PNGs are committed.
 
 ## Gotchas
