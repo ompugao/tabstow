@@ -272,3 +272,11 @@ func TestSyncRejectsNonObjectDataAndFutureTimestamps(t *testing.T) {
 		}
 	}
 }
+
+func TestResponsesAreNotCached(t *testing.T) {
+	srv := newTestServer(t, "github:alice", alice)
+	resp, _ := noFollow.Get(srv.URL + "/auth/github/start?redirect=" + url.QueryEscape(extRedirect))
+	if resp.Header.Get("Cache-Control") != "no-store" || resp.Header.Get("X-Content-Type-Options") != "nosniff" {
+		t.Fatalf("headers = %v", resp.Header)
+	}
+}

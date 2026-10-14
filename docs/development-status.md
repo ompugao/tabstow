@@ -83,6 +83,8 @@ Groups have no position; they sort by starred, then `createdAt` descending.
 - At most 1000 pending OAuth states. Expired ones are purged on insert; past the cap `/auth/*/start` answers 429.
 - Sync limits: 200,000 records per user (tombstones included), `data` must be a JSON object, and
   `updatedAt` may be at most 24 hours ahead of the server clock, so no record can be pinned forever.
+- `http.Server` has read, write, and idle timeouts. Every response carries `Cache-Control: no-store`,
+  `nosniff`, `no-referrer`, and a restrictive CSP. `DEV_TOKEN` is compared in constant time.
 - Generic OIDC requires `email_verified: true`, since the allowlist matches on email.
 - `DEV_TOKEN` is a fixed bearer token for local testing, refused unless `BASE_URL` is localhost.
 

@@ -75,7 +75,14 @@ func run(log *slog.Logger) error {
 	go purgeLoop(ctx, st, cfg.TombstoneTTL, log)
 
 	api := &httpapi.Server{Store: st, Providers: ps, Allow: allow, ExtensionIDs: extIDs, TokenTTL: cfg.TokenTTL, DevToken: cfg.DevToken, Log: log}
-	srv := &http.Server{Addr: cfg.ListenAddr, Handler: api.Handler(), ReadHeaderTimeout: 10 * time.Second}
+	srv := &http.Server{
+		Addr:              cfg.ListenAddr,
+		Handler:           api.Handler(),
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       2 * time.Minute,
+	}
 	go func() {
 		<-ctx.Done()
 		shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)

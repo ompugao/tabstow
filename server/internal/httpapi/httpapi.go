@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"log/slog"
@@ -43,7 +44,20 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle("POST /api/sync", s.authed(s.handleSync))
 	mux.Handle("POST /api/logout", s.authed(s.handleLogout))
 	mux.Handle("POST /api/logout_all", s.authed(s.handleLogoutAll))
-	return mux
+	return secureHeaders(mux)
+}
+
+// secureHeaders keeps tokens out of caches (the sign-in callback carries one in
+// its Location header) and stops browsers from sniffing or framing responses.
+func secureHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h := w.Header()
+		h.Set("Cache-Control", "no-store")
+		h.Set("X-Content-Type-Options", "nosniff")
+		h.Set("Referrer-Policy", "no-referrer")
+		h.Set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *Server) provider(name string) auth.Provider {
@@ -197,7 +211,7 @@ func (s *Server) authed(next http.HandlerFunc) http.Handler {
 }
 
 func (s *Server) lookup(ctx context.Context, token string) (store.User, error) {
-	if s.DevToken != "" && token == s.DevToken {
+	if s.DevToken != "" && subtle.ConstantTimeCompare([]byte(token), []byte(s.DevToken)) == 1 {
 		return s.Store.UpsertUser(ctx, "dev", "local", "dev:local", "")
 	}
 	user, err := s.Store.UserByToken(ctx, token)
