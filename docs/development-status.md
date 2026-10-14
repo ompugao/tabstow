@@ -64,7 +64,7 @@ Groups have no position; they sort by starred, then `createdAt` descending.
 - `src/ui/` – list page. `src/options/` – settings page. Both render from `chrome.storage` through
   `useSnapshot` in `src/lib/hooks.ts`; there is no message passing for data.
 - Server host permission is optional (`optional_host_permissions`) and requested at runtime when the
-  user saves the server URL. Changing the server URL drops the session, resets `lastSeq`, and marks all
+  user saves the server URL. Changing the server URL revokes the session, resets `lastSeq`, and marks all
   local records dirty so they upload to the new server.
 - Favicons come from Chrome's `_favicon` endpoint, never from the stowed sites.
 - Only http(s)/ftp/file URLs are rendered as links or opened (`isOpenableUrl`), whatever the record says.

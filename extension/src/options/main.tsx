@@ -6,7 +6,7 @@ import { SignInError, signIn, signOut } from '../lib/auth';
 import { requestSync, useSnapshot } from '../lib/hooks';
 import { t } from '../lib/i18n';
 import { stripLocal, type DeviceRec, type Rec } from '../lib/model';
-import { normalizeServerUrl, originPattern, saveSettings, setAuth } from '../lib/settings';
+import { normalizeServerUrl, originPattern, saveSettings } from '../lib/settings';
 import { chromeKV } from '../lib/storage';
 import { Store } from '../lib/store';
 import { resetLastSeq } from '../lib/sync';
@@ -31,10 +31,10 @@ function signInErrorText(e: unknown): string {
   return t('errSignIn', e instanceof Error ? e.message : String(e));
 }
 
-// A different server holds a different dataset: drop the old session and
+// A different server holds a different dataset: end the old session and
 // re-upload everything stored locally to the new one.
 async function switchServer(serverUrl: string) {
-  await setAuth(kv, null);
+  await signOut(kv, false);
   await resetLastSeq(store);
   await store.markAllDirty();
   await saveSettings(kv, { serverUrl });
