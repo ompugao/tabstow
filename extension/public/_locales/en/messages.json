@@ -109,6 +109,12 @@
       }
     }
   },
+  "groupCountOne": {
+    "message": "1 group"
+  },
+  "tabCountOne": {
+    "message": "1 tab"
+  },
   "groupCount": {
     "message": "$COUNT$ groups",
     "placeholders": {

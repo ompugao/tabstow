@@ -2,7 +2,7 @@ import { render } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import '../styles.css';
 import { requestSync, useSnapshot } from '../lib/hooks';
-import { t } from '../lib/i18n';
+import { t, tCount } from '../lib/i18n';
 import { isOpenableUrl, type TabRec } from '../lib/model';
 import type { SyncStatus } from '../lib/settings';
 import { chromeKV } from '../lib/storage';
@@ -152,11 +152,11 @@ function GroupCard(props: { gv: GroupView; removeOnOpen: boolean; searching: boo
         <InlineEdit
           class="title"
           value={group.data.title}
-          placeholder={t('tabCount', tabs.length)}
+          placeholder={tCount('tabCount', tabs.length)}
           onSave={(title) => store.updateGroup(group.id, { title })}
         />
         <span class="muted">
-          {group.data.title ? `${t('tabCount', tabs.length)} · ` : ''}
+          {group.data.title ? `${tCount('tabCount', tabs.length)} · ` : ''}
           {new Date(group.data.createdAt).toLocaleString()}
         </span>
         <div class="actions">
@@ -229,7 +229,7 @@ function DeviceSection(props: { dv: DeviceView; collapsed: boolean; toggle: () =
         </h2>
         {dv.isThisDevice && <span class="muted">{t('thisDevice')}</span>}
         <span class="muted">
-          {t('groupCount', dv.groups.length)} · {t('tabCount', dv.tabCount)}
+          {tCount('groupCount', dv.groups.length)} · {tCount('tabCount', dv.tabCount)}
         </span>
       </header>
       {!props.collapsed &&
