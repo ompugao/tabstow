@@ -31,6 +31,7 @@ type Server struct {
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /{$}", handleLanding)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("ok")) })
 	mux.HandleFunc("GET /auth/providers", s.handleProviders)
 	mux.HandleFunc("GET /auth/{provider}/start", s.handleStart)

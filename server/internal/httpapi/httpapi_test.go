@@ -190,3 +190,24 @@ func TestSyncRejectsInvalidRecord(t *testing.T) {
 		t.Fatalf("got %s", resp.Status)
 	}
 }
+
+func TestLandingPage(t *testing.T) {
+	srv := newTestServer(t, "", auth.Identity{Provider: "github", Subject: "1"})
+	resp, err := http.Get(srv.URL + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK || !strings.Contains(string(body), "Tabstow") {
+		t.Fatalf("GET /: %s %q", resp.Status, body)
+	}
+	resp, err = http.Get(srv.URL + "/nope")
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNotFound {
+		t.Fatalf("GET /nope: %s", resp.Status)
+	}
+}
