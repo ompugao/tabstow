@@ -86,8 +86,8 @@ func (o *OIDC) Exchange(ctx context.Context, code string) (Identity, error) {
 	if err := idToken.Claims(&claims); err != nil {
 		return Identity{}, err
 	}
-	// Some identity providers omit email_verified; only an explicit false is rejected.
-	if claims.Email == "" || (claims.EmailVerified != nil && !*claims.EmailVerified) {
+	// The allowlist matches on email, so an unverified email could be anyone's.
+	if claims.Email == "" || claims.EmailVerified == nil || !*claims.EmailVerified {
 		return Identity{}, errors.New("verified email required")
 	}
 	return Identity{Provider: o.name, Subject: idToken.Subject, Login: claims.Username, Email: claims.Email}, nil
