@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import '../styles.css';
 import { requestSync, useSnapshot } from '../lib/hooks';
 import { t } from '../lib/i18n';
-import type { TabRec } from '../lib/model';
+import { isOpenableUrl, type TabRec } from '../lib/model';
 import type { SyncStatus } from '../lib/settings';
 import { chromeKV } from '../lib/storage';
 import { Store } from '../lib/store';
@@ -116,7 +116,12 @@ function TabRow(props: { tab: TabRec; group: GroupView; removeOnOpen: boolean; d
       }}
     >
       <img src={faviconSrc(tab.data.url)} alt="" />
-      <a href={tab.data.url} title={tab.data.url} onClick={open} onAuxClick={open}>
+      <a
+        href={isOpenableUrl(tab.data.url) ? tab.data.url : undefined}
+        title={tab.data.url}
+        onClick={open}
+        onAuxClick={open}
+      >
         {tab.data.title}
       </a>
       <button class="remove danger" title={t('removeTab')} onClick={() => store.deleteTabs([tab.id])}>

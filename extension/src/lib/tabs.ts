@@ -1,3 +1,4 @@
+import { isOpenableUrl } from './model';
 import type { Store, TabInput } from './store';
 
 const LIST_PATH = 'ui/index.html';
@@ -8,7 +9,7 @@ const isListPage = (url: string) => url.startsWith(listUrl());
 
 export function isArchivable(tab: chrome.tabs.Tab): boolean {
   const url = tab.url ?? '';
-  return !tab.pinned && /^(https?|ftp|file):/.test(url) && !isListPage(url);
+  return !tab.pinned && isOpenableUrl(url) && !isListPage(url);
 }
 
 function toInput(tab: chrome.tabs.Tab): TabInput {
@@ -51,7 +52,8 @@ export async function archive(store: Store, tabs: chrome.tabs.Tab[], close: bool
 }
 
 export async function openUrls(urls: string[], active: boolean): Promise<void> {
-  for (const [i, url] of urls.entries()) await chrome.tabs.create({ url, active: active && i === 0 });
+  const safe = urls.filter(isOpenableUrl);
+  for (const [i, url] of safe.entries()) await chrome.tabs.create({ url, active: active && i === 0 });
 }
 
 export function faviconSrc(pageUrl: string): string {

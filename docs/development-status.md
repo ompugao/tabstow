@@ -67,6 +67,7 @@ Groups have no position; they sort by starred, then `createdAt` descending.
   user saves the server URL. Changing the server URL drops the session, resets `lastSeq`, and marks all
   local records dirty so they upload to the new server.
 - Favicons come from Chrome's `_favicon` endpoint, never from the stowed sites.
+- Only http(s)/ftp/file URLs are rendered as links or opened (`isOpenableUrl`), whatever the record says.
 
 ### Server (`server/`)
 

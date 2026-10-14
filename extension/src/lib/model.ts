@@ -43,3 +43,7 @@ export function stripLocal(r: StoredRec): Rec {
   const { dirty: _dirty, ...rest } = r;
   return rest as Rec;
 }
+
+// Only these schemes are stowed, rendered as links, or opened. Records can come
+// from the server or an import file, so a URL there may be anything.
+export const isOpenableUrl = (url: string) => /^(https?|ftp|file):/i.test(url);
