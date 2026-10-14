@@ -5,6 +5,7 @@ Click the toolbar button and the tabs of the current window are stowed into a li
 Each machine keeps its own list, and every list is synced through a server you host yourself,
 so you can see, open, edit, and delete tabs stowed on any of your machines.
 
+- Open source (MIT), extension and server alike. Your tabs never go to the developer or a third-party cloud.
 - Works fully offline. Sync is optional.
 - Self-hosted server: one Go binary with one SQLite file.
 - Sign-in with GitHub (default), Google, or any OpenID Connect provider, restricted by an allowlist.
@@ -108,6 +109,7 @@ The server stores the URLs and titles of your stowed tabs in plain text. Only yo
 through the API, but anyone with access to the server's disk can read the database.
 The extension sends data only to the server URL you configure. Favicons are taken from the browser's
 own cache, so opening the list page does not contact the stowed websites.
+There are no analytics or ads. See [PRIVACY.md](PRIVACY.md) for the full privacy policy.
 
 ## Development
 
