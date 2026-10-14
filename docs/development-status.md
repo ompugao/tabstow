@@ -75,7 +75,7 @@ Groups have no position; they sort by starred, then `createdAt` descending.
 - `internal/store/users.go` – users, tokens, one-shot OAuth states.
 - `internal/auth/` – providers and the allowlist. OIDC discovery is lazy so the server starts while the
   issuer is down. Redirect targets must match `https://<32 a-p chars>.chromiumapp.org/`.
-- `internal/httpapi/` – routes: `/healthz`, `/auth/providers`, `/auth/{provider}/start`,
+- `internal/httpapi/` – routes: `/` (static landing page in `landing.go`, exact path only), `/healthz`, `/auth/providers`, `/auth/{provider}/start`,
   `/auth/{provider}/callback`, `/api/me`, `/api/sync`, `/api/logout`, `/api/logout_all`.
   The callback returns the token in the redirect fragment (`#token=` or `#error=`).
 - Hourly purge of tombstones older than `TOMBSTONE_TTL`, expired tokens, and expired states.
@@ -100,11 +100,15 @@ Verified:
 - The Docker image builds and runs (~25 MB, distroless, non-root, `/data` owned by `nonroot`).
 - The owner loaded `extension/dist` unpacked in their own Chrome and confirmed it works locally
   (without a sync server).
+- The owner deployed the server with Docker behind a reverse proxy. Through the proxy, `/` serves the
+  landing page, `/healthz` returns `ok`, `/auth/providers` lists `github`, and `/auth/github/start`
+  redirects to GitHub with the right callback URL.
 
 Not verified:
 
 - Sync against the owner's deployed server.
-- Real sign-in with GitHub, Google, or a generic OIDC provider. It needs an OAuth app created by the owner.
+- A completed real sign-in. The owner created a GitHub OAuth app, but nobody has finished the flow from
+  the extension yet. Google and generic OIDC are untested.
 - Edge and Brave (only Chrome was tested).
 - Drag and drop in the list page was not exercised by automated tests.
 
@@ -113,7 +117,7 @@ Not verified:
 - Popup: dropped on purpose. A popup and a one-click toolbar action cannot coexist; actions are in the
   toolbar context menu instead.
 - Personal access token sign-in (paste a token generated on the server).
-- Web page on the server, duplicate detection, Chrome tab group colors, Firefox, Japanese locale,
+- A web UI on the server (only a static landing page exists), duplicate detection, Chrome tab group colors, Firefox, Japanese locale,
   client-side encryption, group reordering.
 - Chrome Web Store assets: the icon in `extension/scripts/icon.svg` is a placeholder; no screenshots yet.
 - `extension/scripts/make-icons.mjs` regenerates PNGs; the PNGs are committed.

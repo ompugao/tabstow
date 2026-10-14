@@ -122,7 +122,7 @@ OAuth runs on the server; the extension never holds client secrets.
 ## Server details
 
 - Tables: `users(id, identity, email, created_at)`, `tokens(hash, user_id, expires_at)`, `oauth_states(state, provider, redirect, expires_at)`, `records(user_id, id, kind, updated_at, deleted, seq, data JSON, PRIMARY KEY(user_id, id))`, index `(user_id, seq)`, `meta(purge_watermark_seq)`.
-- Middleware: bearer auth, request body limit (8 MB), structured logging. `GET /healthz`.
+- Middleware: bearer auth, request body limit (8 MB), structured logging. `GET /healthz`. `GET /` serves a static landing page.
 - Hourly purge of expired tokens, expired states, and tombstones older than 30 days.
 - Dockerfile: multi-stage, `CGO_ENABLED=0`, distroless, volume for `DB_PATH`.
 
