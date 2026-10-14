@@ -12,6 +12,11 @@ import (
 const (
 	MaxIDLength   = 64
 	MaxDataLength = 64 * 1024
+	// MaxRecordsPerUser bounds one account's storage, tombstones included.
+	MaxRecordsPerUser = 200_000
+	// MaxClockSkew is how far in the future updatedAt may be. A record far in the
+	// future could never be overwritten or deleted by any other device.
+	MaxClockSkew = 24 * time.Hour
 )
 
 var validKinds = map[string]bool{"device": true, "group": true, "tab": true}
@@ -35,7 +40,7 @@ type ValidationError struct{ Msg string }
 
 func (e ValidationError) Error() string { return e.Msg }
 
-func validate(r Record) error {
+func validate(r Record, now time.Time) error {
 	if r.ID == "" || len(r.ID) > MaxIDLength {
 		return ValidationError{fmt.Sprintf("record id must be 1..%d characters", MaxIDLength)}
 	}
@@ -45,8 +50,12 @@ func validate(r Record) error {
 	if len(r.Data) > MaxDataLength {
 		return ValidationError{fmt.Sprintf("record %s: data too large", r.ID)}
 	}
-	if len(r.Data) == 0 {
-		return ValidationError{fmt.Sprintf("record %s: missing data", r.ID)}
+	var obj map[string]json.RawMessage
+	if len(r.Data) == 0 || json.Unmarshal(r.Data, &obj) != nil || obj == nil {
+		return ValidationError{fmt.Sprintf("record %s: data must be a JSON object", r.ID)}
+	}
+	if r.UpdatedAt < 0 || r.UpdatedAt > now.Add(MaxClockSkew).UnixMilli() {
+		return ValidationError{fmt.Sprintf("record %s: updatedAt is too far in the future; check this device's clock", r.ID)}
 	}
 	return nil
 }
@@ -57,7 +66,7 @@ func validate(r Record) error {
 // version's seq.
 func (s *Store) Sync(ctx context.Context, userID, since int64, changes []Record) (SyncResult, error) {
 	for _, r := range changes {
-		if err := validate(r); err != nil {
+		if err := validate(r, s.now()); err != nil {
 			return SyncResult{}, err
 		}
 	}
@@ -99,6 +108,13 @@ func (s *Store) Sync(ctx context.Context, userID, since int64, changes []Record)
 			userID, r.ID, r.Kind, r.UpdatedAt, r.Deleted, lastSeq, storedAt, string(r.Data)); err != nil {
 			return SyncResult{}, err
 		}
+	}
+	var count int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM records WHERE user_id = ?`, userID).Scan(&count); err != nil {
+		return SyncResult{}, err
+	}
+	if count > MaxRecordsPerUser {
+		return SyncResult{}, ValidationError{fmt.Sprintf("storage limit of %d records reached", MaxRecordsPerUser)}
 	}
 	if _, err := tx.ExecContext(ctx, `UPDATE users SET last_seq = ? WHERE id = ?`, lastSeq, userID); err != nil {
 		return SyncResult{}, err

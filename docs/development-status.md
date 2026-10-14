@@ -81,6 +81,8 @@ Groups have no position; they sort by starred, then `createdAt` descending.
   The callback returns the token in the redirect fragment (`#token=` or `#error=`).
 - Hourly purge of tombstones older than `TOMBSTONE_TTL`, expired tokens, and expired states.
 - At most 1000 pending OAuth states. Expired ones are purged on insert; past the cap `/auth/*/start` answers 429.
+- Sync limits: 200,000 records per user (tombstones included), `data` must be a JSON object, and
+  `updatedAt` may be at most 24 hours ahead of the server clock, so no record can be pinned forever.
 - Generic OIDC requires `email_verified: true`, since the allowlist matches on email.
 - `DEV_TOKEN` is a fixed bearer token for local testing, refused unless `BASE_URL` is localhost.
 

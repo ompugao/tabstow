@@ -256,3 +256,19 @@ func TestReusedGitHubLoginCannotSignIn(t *testing.T) {
 		t.Fatalf("fragment = %v", frag)
 	}
 }
+
+func TestSyncRejectsNonObjectDataAndFutureTimestamps(t *testing.T) {
+	srv := newTestServer(t, "github:alice", alice)
+	token := signIn(t, srv, "github").Get("token")
+	future := time.Now().Add(48 * time.Hour).UnixMilli()
+	for name, rec := range map[string]map[string]any{
+		"null data":   {"id": "x", "kind": "tab", "updatedAt": 1, "data": nil},
+		"string data": {"id": "x", "kind": "tab", "updatedAt": 1, "data": "hi"},
+		"future":      {"id": "x", "kind": "tab", "updatedAt": future, "data": map[string]any{}},
+	} {
+		body := map[string]any{"since": 0, "changes": []map[string]any{rec}}
+		if resp := call(t, srv, "POST", "/api/sync", token, body); resp.StatusCode != 400 {
+			t.Errorf("%s: got %s", name, resp.Status)
+		}
+	}
+}

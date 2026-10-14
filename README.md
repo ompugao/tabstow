@@ -27,6 +27,7 @@ Every group, tab, and machine name is a separate record with a timestamp.
 When two machines change the same record, the later change wins on all machines, and the other change is discarded.
 A deleted group stays deleted: if another machine moved a tab into it at the same time, that tab is removed too.
 Machines need roughly correct clocks (NTP) for "later" to mean what you expect.
+The server refuses changes stamped more than 24 hours in the future, and stores at most 200,000 records per account.
 
 ## Running the server
 
