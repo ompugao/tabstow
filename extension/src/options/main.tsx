@@ -2,7 +2,7 @@ import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import '../styles.css';
 import { fetchProviders } from '../lib/api';
-import { SignInError, signIn, signOut } from '../lib/auth';
+import { SignInError, signIn, signOut, type SignInStep } from '../lib/auth';
 import { requestSync, useSnapshot } from '../lib/hooks';
 import { t } from '../lib/i18n';
 import { stripLocal, type DeviceRec, type Rec } from '../lib/model';
@@ -88,6 +88,7 @@ function ServerSection(props: { serverUrl: string }) {
 function AccountSection(props: { serverUrl: string; identity: string | null }) {
   const [providers, setProviders] = useState<string[] | null>(null);
   const [msg, setMsg] = useState<Message>(null);
+  const [step, setStep] = useState<SignInStep | null>(null);
 
   useEffect(() => {
     setProviders(null);
@@ -107,12 +108,15 @@ function AccountSection(props: { serverUrl: string; identity: string | null }) {
   }
 
   const doSignIn = async (p: string) => {
+    if (step) return;
     setMsg(null);
     try {
-      await signIn(kv, p);
+      await signIn(kv, p, setStep);
       requestSync();
     } catch (e) {
       setMsg({ text: signInErrorText(e), error: true });
+    } finally {
+      setStep(null);
     }
   };
 
@@ -134,11 +138,12 @@ function AccountSection(props: { serverUrl: string; identity: string | null }) {
           <p class="muted">{t('extensionIdHelp', chrome.runtime.id)}</p>
           <div class="row">
             {(providers ?? []).map((p) => (
-              <button class="primary" key={p} onClick={() => doSignIn(p)}>
+              <button class="primary" key={p} disabled={step !== null} onClick={() => doSignIn(p)}>
                 {t('signInWith', PROVIDER_LABELS[p] ?? p)}
               </button>
             ))}
           </div>
+          {step && <div class="message muted">{t(step === 'browser' ? 'signInBrowser' : 'signInVerifying')}</div>}
         </>
       )}
       <Msg msg={msg} />

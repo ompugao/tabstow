@@ -11,10 +11,13 @@ export class SignInError extends Error {
   }
 }
 
-export async function signIn(kv: KV, provider: string): Promise<string> {
+export type SignInStep = 'browser' | 'verifying';
+
+export async function signIn(kv: KV, provider: string, onStep: (step: SignInStep) => void = () => {}): Promise<string> {
   const { serverUrl } = await getSettings(kv);
   const redirect = chrome.identity.getRedirectURL();
   const url = `${serverUrl}/auth/${encodeURIComponent(provider)}/start?redirect=${encodeURIComponent(redirect)}`;
+  onStep('browser');
   const result = await chrome.identity.launchWebAuthFlow({ url, interactive: true });
   if (!result) throw new SignInError('cancelled');
   const params = new URLSearchParams(new URL(result).hash.slice(1));
@@ -22,6 +25,7 @@ export async function signIn(kv: KV, provider: string): Promise<string> {
   if (error) throw new SignInError(error, params.get('identity') ?? undefined);
   const token = params.get('token');
   if (!token) throw new SignInError('no_token');
+  onStep('verifying');
   const me = await fetchMe(serverUrl, token);
   await setAuth(kv, { serverUrl, token, identity: me.identity });
   return me.identity;

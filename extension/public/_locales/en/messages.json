@@ -197,6 +197,12 @@
       }
     }
   },
+  "signInBrowser": {
+    "message": "Waiting for you to finish signing in the pop-up window…"
+  },
+  "signInVerifying": {
+    "message": "Verifying sign-in…"
+  },
   "signOut": {
     "message": "Sign out"
   },
